@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="settings.css">
 </head>
 <body>
+  <div id="toast-container"></div>
   <div id="app">
     <h1>Settings</h1>
 
@@ -42,6 +43,16 @@
         <option value="fr">French</option>
         <option value="en">English</option>
       </select>
+    </section>
+
+    <section id="shortcut-section">
+      <label>Shortcut</label>
+      <div class="shortcut-row">
+        <input type="text" id="shortcut-display" readonly value="Alt + Space">
+        <button id="shortcut-assign-btn" type="button">Assign</button>
+        <button id="shortcut-default-btn" type="button">Default</button>
+      </div>
+      <div id="shortcut-error" class="shortcut-error"></div>
     </section>
 
     <section id="model-section">

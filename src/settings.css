@@ -11,6 +11,45 @@ body {
   padding: 24px;
 }
 
+#toast-container {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: #3a1010;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #ff8888;
+  pointer-events: auto;
+  animation: toast-in 0.3s ease, toast-out 0.3s ease 5s forwards;
+  cursor: pointer;
+}
+
+.toast::before {
+  content: "\26A0";
+  margin-right: 8px;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 #app {
   max-width: 450px;
   margin: 0 auto;
@@ -126,4 +165,48 @@ button:active {
   color: rgba(255, 255, 255, 0.5);
   margin-top: 4px;
   text-align: center;
+}
+
+.shortcut-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#shortcut-display {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+  outline: none;
+  text-align: center;
+  font-weight: 500;
+}
+
+#shortcut-display.listening {
+  border-color: rgba(100, 180, 255, 0.6);
+  color: rgba(255, 255, 255, 0.4);
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(100, 180, 255, 0.3); }
+  50% { border-color: rgba(100, 180, 255, 0.8); }
+}
+
+#shortcut-assign-btn,
+#shortcut-default-btn {
+  width: auto;
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+
+.shortcut-error {
+  font-size: 12px;
+  color: #ff4444;
+  margin-top: 4px;
+  min-height: 16px;
 }

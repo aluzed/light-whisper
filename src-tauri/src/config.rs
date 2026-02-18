@@ -9,6 +9,7 @@ pub struct AppConfig {
     pub model_size: String,
     pub language: String,
     pub engine: String,
+    pub shortcut: String,
 }
 
 impl Default for AppConfig {
@@ -18,6 +19,7 @@ impl Default for AppConfig {
             model_size: "base".to_string(),
             language: "auto".to_string(),
             engine: "whisper".to_string(),
+            shortcut: "Alt+Space".to_string(),
         }
     }
 }

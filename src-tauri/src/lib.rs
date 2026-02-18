@@ -80,11 +80,37 @@ async fn download_model(engine: String, model_size: String, app: AppHandle) -> R
     Ok(())
 }
 
+#[tauri::command]
+fn change_shortcut(shortcut: String, app: AppHandle, state: tauri::State<'_, AppState>) -> Result<(), String> {
+    use tauri_plugin_global_shortcut::GlobalShortcutExt;
+
+    // Unregister all shortcuts then register the new one
+    app.global_shortcut()
+        .unregister_all()
+        .map_err(|e| format!("Failed to unregister shortcuts: {}", e))?;
+
+    app.global_shortcut()
+        .register(shortcut.as_str())
+        .map_err(|e| format!("Invalid shortcut '{}': {}", shortcut, e))?;
+
+    // Update config in memory and on disk
+    let mut cfg = state.config.lock().unwrap();
+    cfg.shortcut = shortcut;
+    config::save_config_to_disk(&cfg).map_err(|e| format!("Failed to save config: {}", e))?;
+
+    Ok(())
+}
+
 fn get_model_path_for_config(cfg: &config::AppConfig) -> std::path::PathBuf {
     match cfg.engine.as_str() {
         "parakeet" => model_manager::parakeet_model_dir(),
         _ => model_manager::whisper_model_path(&cfg.model_size),
     }
+}
+
+fn emit_error(app: &AppHandle, msg: &str) {
+    eprintln!("{}", msg);
+    let _ = app.emit("app-error", msg.to_string());
 }
 
 fn do_toggle_recording(app: &AppHandle) {
@@ -109,7 +135,7 @@ fn do_toggle_recording(app: &AppHandle) {
                 let mut engine = state.engine.lock().unwrap();
 
                 if !engine.is_loaded() {
-                    eprintln!("STT engine not loaded");
+                    emit_error(app, "STT engine not loaded — download a model in Settings");
                     return;
                 }
 
@@ -119,14 +145,14 @@ fn do_toggle_recording(app: &AppHandle) {
                             // Small delay to let the previous app regain focus
                             std::thread::sleep(std::time::Duration::from_millis(200));
                             if let Err(e) = paste::paste_text(&text) {
-                                eprintln!("Paste error: {}", e);
+                                emit_error(app, &format!("Paste failed: {}", e));
                             }
                         }
                     }
-                    Err(e) => eprintln!("Transcription error: {}", e),
+                    Err(e) => emit_error(app, &format!("Transcription failed: {}", e)),
                 }
             }
-            Err(e) => eprintln!("Stop recording error: {}", e),
+            Err(e) => emit_error(app, &format!("Recording failed: {}", e)),
         }
     } else {
         // Start recording
@@ -140,7 +166,7 @@ fn do_toggle_recording(app: &AppHandle) {
         }
 
         if let Err(e) = state.recorder.lock().unwrap().start(&device, app.clone()) {
-            eprintln!("Start recording error: {}", e);
+            emit_error(app, &format!("Cannot start recording: {}", e));
         }
     }
 }
@@ -230,12 +256,23 @@ pub fn run() {
             list_audio_devices,
             check_model_exists,
             download_model,
+            change_shortcut,
         ])
+        .on_window_event(|window, event| {
+            // Hide settings window on close instead of destroying it
+            if window.label() == "settings" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+        })
         .setup(move |app| {
             setup_tray(app.handle())?;
 
             use tauri_plugin_global_shortcut::GlobalShortcutExt;
-            app.global_shortcut().register("Alt+Space")?;
+            let shortcut = app.state::<AppState>().config.lock().unwrap().shortcut.clone();
+            app.global_shortcut().register(shortcut.as_str())?;
 
             // Auto-open settings if no model is available
             if !has_model {

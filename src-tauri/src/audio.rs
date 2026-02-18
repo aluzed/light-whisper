@@ -45,8 +45,9 @@ impl AudioRecorder {
         let device_name = device_name.to_string();
 
         let handle = std::thread::spawn(move || {
-            if let Err(e) = run_recording(device_name, samples, recording, sample_rate_out, app) {
+            if let Err(e) = run_recording(device_name, samples, recording, sample_rate_out, app.clone()) {
                 eprintln!("Recording error: {}", e);
+                let _ = app.emit("app-error", format!("Audio error: {}", e));
             }
         });
 
