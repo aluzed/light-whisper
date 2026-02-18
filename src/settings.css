@@ -1,0 +1,129 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  padding: 24px;
+}
+
+#app {
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #ffffff;
+}
+
+section {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+select, button {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+select {
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+
+select:hover {
+  border-color: rgba(100, 180, 255, 0.4);
+}
+
+button {
+  background: #0f3460;
+  border: 1px solid rgba(100, 180, 255, 0.3);
+  color: #64b4ff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+button:hover {
+  background: #1a4a7a;
+  border-color: rgba(100, 180, 255, 0.5);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+#save-btn {
+  background: #1a6b3c;
+  border-color: rgba(80, 200, 120, 0.3);
+  color: #50c878;
+  margin-top: 8px;
+}
+
+#save-btn:hover {
+  background: #1f7d47;
+  border-color: rgba(80, 200, 120, 0.5);
+}
+
+#model-status {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#progress-container {
+  margin-top: 10px;
+}
+
+#progress-container.hidden {
+  display: none;
+}
+
+#progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #64b4ff, #50c878);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+#progress-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  text-align: center;
+}

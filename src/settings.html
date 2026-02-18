@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Light Whisper - Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Settings</h1>
+
+    <section>
+      <label for="audio-device">Audio Input Device</label>
+      <select id="audio-device">
+        <option value="default">Default</option>
+      </select>
+    </section>
+
+    <section>
+      <label for="engine">STT Engine</label>
+      <select id="engine">
+        <option value="whisper">Whisper (OpenAI)</option>
+        <option value="parakeet">Parakeet TDT v3 (NVIDIA) ~670 MB</option>
+      </select>
+    </section>
+
+    <section id="whisper-options">
+      <label for="model-size">Whisper Model</label>
+      <select id="model-size">
+        <option value="tiny">Tiny (~40 MB) - Fastest</option>
+        <option value="base" selected>Base (~60 MB) - Recommended</option>
+        <option value="small">Small (~200 MB) - Better accuracy</option>
+        <option value="medium">Medium (~500 MB) - Best accuracy</option>
+      </select>
+    </section>
+
+    <section>
+      <label for="language">Language</label>
+      <select id="language">
+        <option value="auto">Auto-detect</option>
+        <option value="fr">French</option>
+        <option value="en">English</option>
+      </select>
+    </section>
+
+    <section id="model-section">
+      <div id="model-status"></div>
+      <button id="download-btn">Download Model</button>
+      <div id="progress-container" class="hidden">
+        <div id="progress-bar">
+          <div id="progress-fill"></div>
+        </div>
+        <div id="progress-text">0%</div>
+      </div>
+    </section>
+
+    <section>
+      <button id="save-btn">Save Settings</button>
+    </section>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>
