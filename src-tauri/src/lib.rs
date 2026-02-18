@@ -111,6 +111,11 @@ fn get_model_path_for_config(cfg: &config::AppConfig) -> std::path::PathBuf {
 fn emit_error(app: &AppHandle, msg: &str) {
     eprintln!("{}", msg);
     let _ = app.emit("app-error", msg.to_string());
+    // Show settings window so the user actually sees the toast
+    if let Some(window) = app.get_webview_window("settings") {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
 }
 
 fn do_toggle_recording(app: &AppHandle) {
@@ -129,6 +134,17 @@ fn do_toggle_recording(app: &AppHandle) {
 
         match result {
             Ok((samples, sample_rate)) => {
+                // Detect silent audio (microphone permission likely missing)
+                let rms = if samples.is_empty() {
+                    0.0
+                } else {
+                    (samples.iter().map(|s| s * s).sum::<f32>() / samples.len() as f32).sqrt()
+                };
+                if rms < 1e-6 {
+                    emit_error(app, "No audio detected — check microphone permissions in System Settings > Privacy & Security > Microphone");
+                    return;
+                }
+
                 let samples_16k = audio::resample(&samples, sample_rate, 16000);
 
                 let language = state.config.lock().unwrap().language.clone();
