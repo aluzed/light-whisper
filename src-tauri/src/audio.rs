@@ -115,6 +115,7 @@ fn run_recording(
                 if !recording_flag.load(Ordering::SeqCst) {
                     return;
                 }
+
                 let mono: Vec<f32> = data
                     .chunks(channels)
                     .map(|frame| frame.iter().sum::<f32>() / channels as f32)
@@ -147,6 +148,7 @@ fn run_recording(
                     if !recording_flag.load(Ordering::SeqCst) {
                         return;
                     }
+
                     let mono: Vec<f32> = data
                         .chunks(channels)
                         .map(|frame| {

@@ -82,8 +82,10 @@ Parakeet supports 25 European languages with automatic language detection. Model
 
 ## Permissions (macOS)
 
+Light Whisper requests both permissions on first launch.
+
 - **Microphone**: required for audio capture. Go to **System Settings > Privacy & Security > Microphone** and enable Light Whisper. Without this permission, macOS silently feeds empty audio to the app — recording appears to work but the waveform stays flat and no transcription is produced.
-- **Accessibility**: required for auto-paste (System Settings > Privacy & Security > Accessibility)
+- **Accessibility**: required for auto-paste (keyboard simulation). Go to **System Settings > Privacy & Security > Accessibility** and enable Light Whisper. The app will prompt on first launch; if denied, transcribed text cannot be pasted automatically.
 
 ## Project Structure
 

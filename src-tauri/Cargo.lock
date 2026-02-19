@@ -2233,6 +2233,7 @@ name = "light-whisper"
 version = "0.1.0"
 dependencies = [
  "arboard",
+ "core-graphics",
  "cpal",
  "dirs",
  "enigo",

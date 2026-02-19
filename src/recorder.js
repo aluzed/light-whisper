@@ -63,10 +63,12 @@ function drawWaveform() {
 }
 
 // Backend emits a single RMS value per update; shift bars left and append
+// Raw RMS is very small for speech (~0.002–0.05), amplify with sqrt curve
 event.listen('waveform-update', (e) => {
   const rms = e.payload;
+  const display = Math.min(1.0, Math.sqrt(rms) * 4);
   bars.shift();
-  bars.push(rms);
+  bars.push(display);
   drawWaveform();
 });
 

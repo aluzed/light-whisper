@@ -9,6 +9,10 @@ pub struct WhisperEngine {
 
 impl WhisperEngine {
     pub fn new() -> Self {
+        // Suppress verbose whisper.cpp C library logging
+        unsafe {
+            whisper_rs::set_log_callback(None, std::ptr::null_mut());
+        }
         Self { ctx: None }
     }
 
