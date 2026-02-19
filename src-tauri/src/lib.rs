@@ -74,6 +74,9 @@ pub fn run() {
             }
         })
         .setup(move |app| {
+            // Hide from Dock — tray-only app
+            app.handle().set_activation_policy(tauri::ActivationPolicy::Accessory)?;
+
             // Prompt for Accessibility permission if not already granted
             // (required for simulating Cmd+V paste)
             paste::ensure_accessibility_permission();

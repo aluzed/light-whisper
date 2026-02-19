@@ -4,5 +4,7 @@
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Light Whisper needs microphone access to record audio for speech-to-text transcription.</string>
+	<key>LSUIElement</key>
+	<true/>
 </dict>
 </plist>
