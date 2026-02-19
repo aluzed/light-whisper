@@ -4,6 +4,8 @@ A lightweight desktop app for global voice-to-text. Press **Alt+Space** anywhere
 
 Built with [Tauri v2](https://v2.tauri.app/) (Rust backend, vanilla JS frontend).
 
+![demo](https://github.com/aluzed/light-whisper/raw/main/demo.gif)
+
 ## Features
 
 - **Global hotkey** (Alt+Space) works from any application
