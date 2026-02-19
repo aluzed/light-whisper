@@ -1,5 +1,6 @@
 use std::sync::atomic::Ordering;
 use tauri::{AppHandle, Emitter, Manager};
+use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
 use crate::audio;
 use crate::paste;
@@ -15,6 +16,30 @@ fn emit_error(app: &AppHandle, msg: &str) {
     }
 }
 
+fn register_escape(app: &AppHandle) {
+    let _ = app.global_shortcut().register("Escape");
+}
+
+fn unregister_escape(app: &AppHandle) {
+    let _ = app.global_shortcut().unregister("Escape");
+}
+
+/// Stop recording and hide overlay without transcribing (ESC cancel).
+pub fn cancel_recording(app: &AppHandle) {
+    let state = app.state::<AppState>();
+    if !state.recorder.lock().unwrap().is_recording() {
+        return;
+    }
+
+    let _ = state.recorder.lock().unwrap().stop();
+    let _ = app.emit("recording-stopped", ());
+    unregister_escape(app);
+
+    if let Some(window) = app.get_webview_window("recorder") {
+        let _ = window.hide();
+    }
+}
+
 pub fn do_toggle_recording(app: &AppHandle) {
     let state = app.state::<AppState>();
     let is_recording = state.recorder.lock().unwrap().is_recording();
@@ -23,6 +48,7 @@ pub fn do_toggle_recording(app: &AppHandle) {
         // Stop recording
         let result = state.recorder.lock().unwrap().stop();
         let _ = app.emit("recording-stopped", ());
+        unregister_escape(app);
 
         // Hide overlay
         if let Some(window) = app.get_webview_window("recorder") {
@@ -98,6 +124,8 @@ pub fn do_toggle_recording(app: &AppHandle) {
 
         if let Err(e) = state.recorder.lock().unwrap().start(&device, app.clone()) {
             emit_error(app, &format!("Cannot start recording: {}", e));
+        } else {
+            register_escape(app);
         }
     }
 }

@@ -46,11 +46,16 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, _shortcut, event| {
+                .with_handler(|app, shortcut, event| {
                     if event.state == tauri_plugin_global_shortcut::ShortcutState::Pressed {
                         let app = app.clone();
+                        let is_escape = shortcut.key == tauri_plugin_global_shortcut::Code::Escape;
                         std::thread::spawn(move || {
-                            recording::do_toggle_recording(&app);
+                            if is_escape {
+                                recording::cancel_recording(&app);
+                            } else {
+                                recording::do_toggle_recording(&app);
+                            }
                         });
                     }
                 })
