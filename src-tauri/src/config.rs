@@ -41,14 +41,6 @@ pub fn parakeet_models_dir() -> PathBuf {
     models_dir().join("parakeet-tdt")
 }
 
-pub fn temp_dir() -> PathBuf {
-    if cfg!(target_os = "windows") {
-        std::env::temp_dir().join("lightwhisper")
-    } else {
-        config_dir().join("temp")
-    }
-}
-
 pub fn load_config() -> AppConfig {
     let path = config_path();
     if path.exists() {
@@ -75,5 +67,4 @@ pub fn ensure_dirs() {
     let _ = fs::create_dir_all(config_dir());
     let _ = fs::create_dir_all(models_dir());
     let _ = fs::create_dir_all(parakeet_models_dir());
-    let _ = fs::create_dir_all(temp_dir());
 }

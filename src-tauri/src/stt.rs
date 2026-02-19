@@ -167,12 +167,4 @@ impl SttEngine {
             EngineInner::Parakeet(p) => p.transcribe(samples, language),
         }
     }
-
-    #[allow(dead_code)]
-    pub fn engine_name(&self) -> &str {
-        match &self.inner {
-            EngineInner::Whisper(_) => "whisper",
-            EngineInner::Parakeet(_) => "parakeet",
-        }
-    }
 }

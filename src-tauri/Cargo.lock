@@ -2238,7 +2238,6 @@ dependencies = [
  "dirs",
  "enigo",
  "futures-util",
- "hound",
  "parakeet-rs",
  "reqwest 0.12.28",
  "serde",

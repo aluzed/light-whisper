@@ -12,7 +12,6 @@ tauri-plugin-global-shortcut = "2"
 whisper-rs = "0.15"
 parakeet-rs = "0.3"
 cpal = { version = "0.16", features = [] }
-hound = "3.5"
 arboard = "3"
 enigo = "0.3"
 core-graphics = "0.24"

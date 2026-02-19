@@ -232,29 +232,3 @@ pub fn resample(samples: &[f32], source_rate: u32, target_rate: u32) -> Vec<f32>
 
     output
 }
-
-/// Save samples as 16-bit WAV file
-pub fn save_wav(path: &std::path::Path, samples: &[f32], sample_rate: u32) -> Result<(), String> {
-    let spec = hound::WavSpec {
-        channels: 1,
-        sample_rate,
-        bits_per_sample: 16,
-        sample_format: hound::SampleFormat::Int,
-    };
-
-    let mut writer =
-        hound::WavWriter::create(path, spec).map_err(|e| format!("WAV create error: {}", e))?;
-
-    for &sample in samples {
-        let s = (sample * 32767.0).clamp(-32768.0, 32767.0) as i16;
-        writer
-            .write_sample(s)
-            .map_err(|e| format!("WAV write error: {}", e))?;
-    }
-
-    writer
-        .finalize()
-        .map_err(|e| format!("WAV finalize error: {}", e))?;
-
-    Ok(())
-}
