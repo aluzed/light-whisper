@@ -22,6 +22,8 @@ cd src-tauri && cargo build
 
 **macOS note:** `CMAKE_OSX_DEPLOYMENT_TARGET=11.0` is required for whisper.cpp's `std::filesystem` usage. This is set automatically via `src-tauri/.cargo/config.toml`.
 
+**Linux note (Ubuntu 22.04+ / Debian 12+):** `sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev libasound2-dev libxdo-dev cmake build-essential`
+
 ## Architecture
 
 Tauri v2 app with Rust backend and vanilla JS frontend (no bundler, `withGlobalTauri: true`).

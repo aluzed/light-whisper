@@ -29,9 +29,42 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install Tauri CLI
 cargo install tauri-cli --version "^2"
+```
 
-# macOS: CMake via Homebrew
+### macOS
+
+```bash
 brew install cmake
+```
+
+### Linux (Ubuntu 22.04+ / Debian 12+)
+
+```bash
+sudo apt-get install -y \
+  libgtk-3-dev \
+  libwebkit2gtk-4.1-dev \
+  libayatana-appindicator3-dev \
+  librsvg2-dev \
+  libssl-dev \
+  libasound2-dev \
+  libxdo-dev \
+  cmake \
+  build-essential
+```
+
+### Linux (Fedora 39+)
+
+```bash
+sudo dnf install -y \
+  gtk3-devel \
+  webkit2gtk4.1-devel \
+  libayatana-appindicator-gtk3 \
+  librsvg2-devel \
+  openssl-devel \
+  alsa-lib-devel \
+  libxdo-devel \
+  cmake \
+  gcc-c++
 ```
 
 ## Build & Run
