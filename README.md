@@ -17,11 +17,13 @@ Built with [Tauri v2](https://v2.tauri.app/) (Rust backend, vanilla JS frontend)
 - **Minimal UI**: frameless overlay during recording, settings accessible from the tray icon
 - **Auto-opens settings** on first launch if no model is downloaded
 
-## Prerequisites
+## Dependencies
 
 - [Rust](https://rustup.rs/) (1.70+)
 - CMake + C/C++ compiler
 - macOS 11+, Windows 10+, or Linux (X11 recommended)
+
+### Prerequisites install
 
 ```bash
 # Install Rust
@@ -29,8 +31,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Install Tauri CLI
 cargo install tauri-cli --version "^2"
+```
 
-# macOS: install Homebrew (https://brew.sh/) then CMake
+### macOS: install Homebrew (https://brew.sh/) then CMake
+
+```bash
+# Optional if you already have homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install cmake
 ```
