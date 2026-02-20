@@ -79,7 +79,8 @@ pub fn run() {
             }
         })
         .setup(move |app| {
-            // Hide from Dock — tray-only app
+            // Hide from Dock — tray-only app (macOS only)
+            #[cfg(target_os = "macos")]
             app.handle().set_activation_policy(tauri::ActivationPolicy::Accessory)?;
 
             // Prompt for Accessibility permission if not already granted
