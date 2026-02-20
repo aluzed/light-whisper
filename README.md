@@ -33,11 +33,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cargo install tauri-cli --version "^2"
 ```
 
-### macOS: install Homebrew (https://brew.sh/) then CMake
+### MacOS: install Homebrew (https://brew.sh/) then CMake
 
 ```bash
 # Optional if you already have homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 brew install cmake
 ```
 
