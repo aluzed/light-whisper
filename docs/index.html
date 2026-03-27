@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Light Whisper - Voice to Text, Anywhere</title>
+  <meta name="description" content="A lightweight desktop app for global voice-to-text. Press Alt+Space anywhere to transcribe and paste." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    /* ── Tokens ── */
+    :root {
+      --coral:    #FF6F61;
+      --blue:     #0F4C81;
+      --yellow:   #F5DF4D;
+      --mint:     #88D8B0;
+      --lavender: #B8A9C9;
+      --peach:    #FFBE76;
+      --sky:      #7EC8E3;
+      --rose:     #F7CAC9;
+
+      --shadow-offset: 5px;
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+
+    /* ── Light theme ── */
+    [data-theme="light"] {
+      --bg-primary:   #FAFAF8;
+      --bg-secondary: #FFFFFF;
+      --bg-hero:      #FF6F61;
+      --bg-features:  #0F4C81;
+      --bg-demo:      #F5DF4D;
+      --bg-engines:   #88D8B0;
+      --bg-cta:       #B8A9C9;
+      --text-primary: #1A1A2E;
+      --text-secondary: #4A4A68;
+      --text-on-coral: #FFFFFF;
+      --text-on-blue:  #FFFFFF;
+      --text-on-yellow:#1A1A2E;
+      --text-on-mint:  #1A1A2E;
+      --text-on-lavender:#1A1A2E;
+      --shadow-color:  rgba(26, 26, 46, 0.18);
+      --shadow-hero:   rgba(0,0,0,0.15);
+      --card-bg:       #FFFFFF;
+      --card-shadow:   #1A1A2E;
+      --nav-bg:        rgba(250, 250, 248, 0.92);
+      --toggle-bg:     #E8E8E4;
+      --toggle-icon:   #1A1A2E;
+    }
+
+    /* ── Dark theme ── */
+    [data-theme="dark"] {
+      --bg-primary:   #111127;
+      --bg-secondary: #1A1A3E;
+      --bg-hero:      #C04D42;
+      --bg-features:  #0A3560;
+      --bg-demo:      #B8A030;
+      --bg-engines:   #2E7D5B;
+      --bg-cta:       #6B5B8D;
+      --text-primary: #F0F0F5;
+      --text-secondary:#B0B0CC;
+      --text-on-coral: #FFFFFF;
+      --text-on-blue:  #E0E8F0;
+      --text-on-yellow:#111127;
+      --text-on-mint:  #111127;
+      --text-on-lavender:#F0F0F5;
+      --shadow-color:  rgba(0, 0, 0, 0.35);
+      --shadow-hero:   rgba(0,0,0,0.3);
+      --card-bg:       #1E1E42;
+      --card-shadow:   #000000;
+      --nav-bg:        rgba(17, 17, 39, 0.92);
+      --toggle-bg:     #2A2A50;
+      --toggle-icon:   #F5DF4D;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: background 0.3s;
+    }
+    .nav-logo {
+      font-size: 1.2rem; font-weight: 800;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a {
+      font-size: 0.9rem; font-weight: 600;
+      opacity: 0.8; transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+    .theme-toggle {
+      width: 42px; height: 42px; border-radius: 50%;
+      border: none; cursor: pointer;
+      background: var(--toggle-bg);
+      color: var(--toggle-icon);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      transition: background 0.3s, color 0.3s, transform 0.2s;
+      box-shadow: 3px 3px 0 var(--shadow-color);
+    }
+    .theme-toggle:hover { transform: translateY(-2px); }
+    .theme-toggle:active { transform: translate(2px, 2px); box-shadow: none; }
+
+    /* ── Section base ── */
+    section { padding: 100px 40px; }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-hero);
+      color: var(--text-on-coral);
+      padding-top: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: var(--yellow);
+      border-radius: 50%;
+      opacity: 0.15;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -40px; left: -40px;
+      width: 200px; height: 200px;
+      background: var(--mint);
+      border-radius: 50%;
+      opacity: 0.12;
+    }
+    .hero-content {
+      max-width: 720px; text-align: center;
+      position: relative; z-index: 1;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 28px;
+      backdrop-filter: blur(4px);
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      opacity: 0.92;
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .hero-buttons {
+      display: flex; gap: 16px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 32px;
+      border-radius: var(--radius-sm);
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; border: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:hover { transform: translateY(-3px); }
+    .btn:active { transform: translate(3px, 3px); box-shadow: none !important; }
+    .btn svg { width: 20px; height: 20px; }
+    .btn-primary {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 rgba(0,0,0,0.25);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 rgba(0,0,0,0.12);
+      backdrop-filter: blur(4px);
+    }
+    .hero-platforms {
+      margin-top: 24px;
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+
+    /* ── Demo ── */
+    .demo {
+      background: var(--bg-demo);
+      color: var(--text-on-yellow);
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+    }
+    .demo h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .demo p {
+      font-size: 1.05rem;
+      opacity: 0.8;
+      margin-bottom: 48px;
+      max-width: 500px;
+    }
+    .demo-frame {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: 8px 8px 0 var(--card-shadow);
+      max-width: 700px;
+      width: 100%;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .demo-frame img {
+      border-radius: 8px;
+      width: 100%;
+      display: block;
+    }
+    .demo-caption {
+      margin-top: 32px;
+      display: flex; gap: 32px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .demo-step {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 600; font-size: 0.95rem;
+    }
+    .demo-step-num {
+      width: 32px; height: 32px;
+      background: var(--coral);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+    }
+
+    /* ── Features ── */
+    .features {
+      background: var(--bg-features);
+      color: var(--text-on-blue);
+    }
+    .features h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 rgba(0,0,0,0.12);
+      transition: transform 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.15);
+    }
+    .feature-icon {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+      font-size: 1.4rem;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
+    }
+    .feature-icon svg { width: 26px; height: 26px; }
+    .feature-card h3 {
+      font-size: 1.15rem; font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 0.92rem;
+      opacity: 0.85;
+      line-height: 1.55;
+    }
+
+    /* ── Engines ── */
+    .engines {
+      background: var(--bg-engines);
+      color: var(--text-on-mint);
+    }
+    .engines h2 {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .engines > p {
+      text-align: center;
+      max-width: 520px;
+      margin: 0 auto 48px;
+      opacity: 0.8;
+      font-size: 1.05rem;
+    }
+    .engines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .engine-card {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      border-radius: var(--radius);
+      padding: 36px 30px;
+      box-shadow: 6px 6px 0 var(--card-shadow);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+    }
+    .engine-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 10px 10px 0 var(--card-shadow);
+    }
+    .engine-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .engine-card:nth-child(1) .engine-badge {
+      background: var(--coral);
+      color: #fff;
+    }
+    .engine-card:nth-child(2) .engine-badge {
+      background: var(--mint);
+      color: var(--text-primary);
+    }
+    .engine-card h3 {
+      font-size: 1.3rem; font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .engine-card p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+    .engine-models {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .engine-model-tag {
+      padding: 5px 14px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--toggle-bg);
+      transition: background 0.3s;
+    }
+
+    /* ── CTA ── */
+    .cta {
+      background: var(--bg-cta);
+      color: var(--text-on-lavender);
+      text-align: center;
+      display: flex; flex-direction: column;
+      align-items: center;
+    }
+    .cta h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .cta p {
+      font-size: 1.1rem;
+      max-width: 480px;
+      opacity: 0.85;
+      margin-bottom: 40px;
+    }
+    .cta .btn-primary {
+      font-size: 1.1rem;
+      padding: 16px 40px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-secondary);
+      padding: 40px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      transition: background 0.3s, color 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .footer-links {
+      display: flex; gap: 24px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .footer-links a {
+      font-weight: 600;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .footer-links a:hover { opacity: 1; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      section { padding: 72px 20px; }
+      .nav-links a.hide-mobile { display: none; }
+      .hero { padding-top: 120px; }
+      .demo-caption { flex-direction: column; align-items: center; }
+      .engines-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+      </svg>
+      Light Whisper
+    </div>
+    <div class="nav-links">
+      <a href="#demo" class="hide-mobile">Demo</a>
+      <a href="#features" class="hide-mobile">Features</a>
+      <a href="#engines" class="hide-mobile">Engines</a>
+      <a href="https://github.com/aluzed/light-whisper" target="_blank">GitHub</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span id="themeIcon">&#9790;</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Open Source &middot; MIT License</div>
+      <h1>Voice to Text,<br/>Anywhere.</h1>
+      <p>Press <strong>Alt+Space</strong> from any application to record your voice. Press again to transcribe and paste instantly.</p>
+      <div class="hero-buttons">
+        <a href="https://github.com/aluzed/light-whisper/releases" target="_blank" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </a>
+        <a href="https://github.com/aluzed/light-whisper" target="_blank" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
+          Source Code
+        </a>
+      </div>
+      <p class="hero-platforms">macOS &middot; Windows &middot; Linux</p>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section class="demo" id="demo">
+    <h2>See it in action</h2>
+    <p>Record, transcribe, and paste &mdash; all in one shortcut.</p>
+    <div class="demo-frame">
+      <img src="https://github.com/aluzed/light-whisper/raw/main/demo.gif" alt="Light Whisper demo — recording and transcribing voice to text" loading="lazy" />
+    </div>
+    <div class="demo-caption">
+      <div class="demo-step">
+        <span class="demo-step-num">1</span>
+        Press Alt+Space
+      </div>
+      <div class="demo-step">
+        <span class="demo-step-num">2</span>
+        Speak
+      </div>
+      <div class="demo-step">
+        <span class="demo-step-num">3</span>
+        Text is pasted
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <h2>Built for simplicity</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--coral);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        </div>
+        <h3>Global Hotkey</h3>
+        <p>Alt+Space works from any application. No need to switch windows or open a separate tool.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--yellow);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+        </div>
+        <h3>100% Offline</h3>
+        <p>All processing happens locally on your machine. Your voice data never leaves your computer.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--mint);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>
+        </div>
+        <h3>Multi-Language</h3>
+        <p>French, English, and 25+ languages with Parakeet. Automatic language detection included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--lavender);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+        </div>
+        <h3>Auto-Paste</h3>
+        <p>Transcribed text is automatically pasted into the active application via clipboard simulation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--peach);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1m0 16v1m-8-9H3m18 0h-1m-2.636-6.364-.707.707M6.343 17.657l-.707.707m0-12.728.707.707m11.314 11.314.707.707"/><circle cx="12" cy="12" r="4"/></svg>
+        </div>
+        <h3>Minimal UI</h3>
+        <p>A tiny frameless overlay appears during recording. Settings are accessible from the system tray.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--sky);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+        </div>
+        <h3>Lightweight</h3>
+        <p>Built with Tauri and Rust. Small binary, low memory footprint, fast startup.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Engines -->
+  <section class="engines" id="engines">
+    <h2>Two powerful engines</h2>
+    <p>Choose the model that fits your needs &mdash; from 40 MB ultra-fast to high-accuracy multi-language.</p>
+    <div class="engines-grid">
+      <div class="engine-card">
+        <span class="engine-badge">OpenAI</span>
+        <h3>Whisper</h3>
+        <p>The reference open-source speech recognition model, running locally via whisper.cpp.</p>
+        <div class="engine-models">
+          <span class="engine-model-tag">tiny ~40 MB</span>
+          <span class="engine-model-tag">base ~60 MB</span>
+          <span class="engine-model-tag">small ~200 MB</span>
+          <span class="engine-model-tag">medium ~500 MB</span>
+        </div>
+      </div>
+      <div class="engine-card">
+        <span class="engine-badge">NVIDIA</span>
+        <h3>Parakeet TDT v3</h3>
+        <p>State-of-the-art accuracy with 25 languages and automatic detection. Runs via ONNX Runtime.</p>
+        <div class="engine-models">
+          <span class="engine-model-tag">int8 ~670 MB</span>
+          <span class="engine-model-tag">WER 7.7% FR</span>
+          <span class="engine-model-tag">25 languages</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Ready to try?</h2>
+    <p>Light Whisper is free and open source. Download it, pick a model, and start talking.</p>
+    <a href="https://github.com/aluzed/light-whisper/releases" target="_blank" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Latest Release
+    </a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://github.com/aluzed/light-whisper" target="_blank">GitHub</a>
+      <a href="https://github.com/aluzed/light-whisper/releases" target="_blank">Releases</a>
+      <a href="https://github.com/aluzed/light-whisper/issues" target="_blank">Issues</a>
+      <a href="https://github.com/aluzed/light-whisper/blob/main/LICENSE" target="_blank">MIT License</a>
+    </div>
+    <p>Made with Rust &amp; Tauri &middot; Light Whisper</p>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    // Check saved preference or system preference
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      html.setAttribute('data-theme', saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      html.setAttribute('data-theme', 'dark');
+    }
+    updateIcon();
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      updateIcon();
+    });
+
+    function updateIcon() {
+      const theme = html.getAttribute('data-theme');
+      icon.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;';
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+
+</body>
+</html>
