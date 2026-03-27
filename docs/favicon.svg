@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="mic" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <!-- Subtle glow behind mic -->
+  <ellipse cx="256" cy="280" rx="120" ry="140" fill="url(#glow)"/>
+
+  <!-- Microphone body -->
+  <rect x="196" y="100" width="120" height="200" rx="60" fill="url(#mic)"/>
+
+  <!-- Mic highlight -->
+  <rect x="220" y="120" width="24" height="80" rx="12" fill="white" opacity="0.25"/>
+
+  <!-- Arc (listener shape) -->
+  <path d="M160 260 A96 96 0 0 0 352 260" fill="none" stroke="#60a5fa" stroke-width="20" stroke-linecap="round"/>
+
+  <!-- Stem -->
+  <line x1="256" y1="356" x2="256" y2="400" stroke="#60a5fa" stroke-width="20" stroke-linecap="round"/>
+
+  <!-- Base -->
+  <line x1="200" y1="400" x2="312" y2="400" stroke="#60a5fa" stroke-width="20" stroke-linecap="round"/>
+</svg>
