@@ -123,6 +123,36 @@
     .theme-toggle:hover { transform: translateY(-2px); }
     .theme-toggle:active { transform: translate(2px, 2px); box-shadow: none; }
 
+    /* ── Lang toggle ── */
+    .lang-toggle {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--toggle-bg);
+      border-radius: 50px;
+      padding: 4px;
+      box-shadow: 3px 3px 0 var(--shadow-color);
+      transition: background 0.3s;
+    }
+    .lang-toggle button {
+      display: flex; align-items: center; gap: 4px;
+      padding: 5px 12px;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .lang-toggle button.active {
+      background: var(--coral);
+      color: #fff;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.12);
+    }
+    .lang-toggle button:not(.active):hover {
+      color: var(--text-primary);
+    }
+
     /* ── Section base ── */
     section { padding: 100px 40px; }
 
@@ -369,6 +399,20 @@
     .engine-card h3 {
       font-size: 1.3rem; font-weight: 800;
       margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .best-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 50px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: var(--yellow);
+      color: #1A1A2E;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.12);
+      vertical-align: middle;
     }
     .engine-card p {
       font-size: 0.92rem;
@@ -464,6 +508,10 @@
       <a href="#features" class="hide-mobile">Features</a>
       <a href="#engines" class="hide-mobile">Engines</a>
       <a href="https://github.com/aluzed/light-whisper" target="_blank">GitHub</a>
+      <div class="lang-toggle" id="langToggle">
+        <button data-lang="en" class="active">&#127468;&#127463; EN</button>
+        <button data-lang="fr">&#127467;&#127479; FR</button>
+      </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <span id="themeIcon">&#9790;</span>
       </button>
@@ -473,104 +521,104 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
-      <div class="hero-badge">Open Source &middot; MIT License</div>
-      <h1>Voice to Text,<br/>Anywhere.</h1>
-      <p>Press <strong>Alt+Space</strong> from any application to record your voice. Press again to transcribe and paste instantly.</p>
+      <div class="hero-badge" data-i18n="heroBadge">Open Source &middot; MIT License</div>
+      <h1 data-i18n="heroTitle">Voice to Text,<br/>Anywhere.</h1>
+      <p data-i18n="heroDesc">Press <strong>Alt+Space</strong> from any application to record your voice. Press again to transcribe and paste instantly.</p>
       <div class="hero-buttons">
-        <a href="https://github.com/aluzed/light-whisper/releases/latest" target="_blank" class="btn btn-primary">
+        <a href="https://github.com/aluzed/light-whisper/releases/latest" target="_blank" class="btn btn-primary" data-i18n="download">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download
         </a>
-        <a href="https://github.com/aluzed/light-whisper" target="_blank" class="btn btn-secondary">
+        <a href="https://github.com/aluzed/light-whisper" target="_blank" class="btn btn-secondary" data-i18n="sourceCode">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>
           Source Code
         </a>
       </div>
-      <p class="hero-platforms">macOS &middot; Windows &middot; Linux</p>
+      <p class="hero-platforms" data-i18n="heroPlatforms">macOS &middot; Windows &middot; Linux</p>
     </div>
   </section>
 
   <!-- Demo -->
   <section class="demo" id="demo">
-    <h2>See it in action</h2>
-    <p>Record, transcribe, and paste &mdash; all in one shortcut.</p>
+    <h2 data-i18n="demoTitle">See it in action</h2>
+    <p data-i18n="demoDesc">Record, transcribe, and paste &mdash; all in one shortcut.</p>
     <div class="demo-frame">
       <img src="https://github.com/aluzed/light-whisper/raw/main/demo.gif" alt="Light Whisper demo — recording and transcribing voice to text" loading="lazy" />
     </div>
     <div class="demo-caption">
       <div class="demo-step">
         <span class="demo-step-num">1</span>
-        Press Alt+Space
+        <span data-i18n="demoStep1">Press Alt+Space</span>
       </div>
       <div class="demo-step">
         <span class="demo-step-num">2</span>
-        Speak
+        <span data-i18n="demoStep2">Speak</span>
       </div>
       <div class="demo-step">
         <span class="demo-step-num">3</span>
-        Text is pasted
+        <span data-i18n="demoStep3">Text is pasted</span>
       </div>
     </div>
   </section>
 
   <!-- Features -->
   <section class="features" id="features">
-    <h2>Built for simplicity</h2>
+    <h2 data-i18n="featuresTitle">Built for simplicity</h2>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon" style="background: var(--coral);">
           <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
         </div>
-        <h3>Global Hotkey</h3>
-        <p>Alt+Space works from any application. No need to switch windows or open a separate tool.</p>
+        <h3 data-i18n="featGlobalHotkey">Global Hotkey</h3>
+        <p data-i18n="featGlobalHotkeyDesc">Alt+Space works from any application. No need to switch windows or open a separate tool.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background: var(--yellow);">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
         </div>
-        <h3>100% Offline</h3>
-        <p>All processing happens locally on your machine. Your voice data never leaves your computer.</p>
+        <h3 data-i18n="featOffline">100% Offline</h3>
+        <p data-i18n="featOfflineDesc">All processing happens locally on your machine. Your voice data never leaves your computer.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background: var(--mint);">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>
         </div>
-        <h3>Multi-Language</h3>
-        <p>French, English, and 25+ languages with Parakeet. Automatic language detection included.</p>
+        <h3 data-i18n="featMultiLang">Multi-Language</h3>
+        <p data-i18n="featMultiLangDesc">French, English, and 25+ languages with Parakeet. Automatic language detection included.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background: var(--lavender);">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
         </div>
-        <h3>Auto-Paste</h3>
-        <p>Transcribed text is automatically pasted into the active application via clipboard simulation.</p>
+        <h3 data-i18n="featAutoPaste">Auto-Paste</h3>
+        <p data-i18n="featAutoPasteDesc">Transcribed text is automatically pasted into the active application via clipboard simulation.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background: var(--peach);">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1m0 16v1m-8-9H3m18 0h-1m-2.636-6.364-.707.707M6.343 17.657l-.707.707m0-12.728.707.707m11.314 11.314.707.707"/><circle cx="12" cy="12" r="4"/></svg>
         </div>
-        <h3>Minimal UI</h3>
-        <p>A tiny frameless overlay appears during recording. Settings are accessible from the system tray.</p>
+        <h3 data-i18n="featMinimalUI">Minimal UI</h3>
+        <p data-i18n="featMinimalUIDesc">A tiny frameless overlay appears during recording. Settings are accessible from the system tray.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background: var(--sky);">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
         </div>
-        <h3>Lightweight</h3>
-        <p>Built with Tauri and Rust. Small binary, low memory footprint, fast startup.</p>
+        <h3 data-i18n="featLightweight">Lightweight</h3>
+        <p data-i18n="featLightweightDesc">Built with Tauri and Rust. Small binary, low memory footprint, fast startup.</p>
       </div>
     </div>
   </section>
 
   <!-- Engines -->
   <section class="engines" id="engines">
-    <h2>Two powerful engines</h2>
-    <p>Choose the model that fits your needs &mdash; from 40 MB ultra-fast to high-accuracy multi-language.</p>
+    <h2 data-i18n="enginesTitle">Two powerful engines</h2>
+    <p data-i18n="enginesDesc">Choose the model that fits your needs &mdash; from 40 MB ultra-fast to high-accuracy multi-language.</p>
     <div class="engines-grid">
       <div class="engine-card">
         <span class="engine-badge">OpenAI</span>
         <h3>Whisper</h3>
-        <p>The reference open-source speech recognition model, running locally via whisper.cpp.</p>
+        <p data-i18n="whisperDesc">The reference open-source speech recognition model, running locally via whisper.cpp.</p>
         <div class="engine-models">
           <span class="engine-model-tag">tiny ~40 MB</span>
           <span class="engine-model-tag">base ~60 MB</span>
@@ -580,8 +628,8 @@
       </div>
       <div class="engine-card">
         <span class="engine-badge">NVIDIA</span>
-        <h3>Parakeet TDT v3</h3>
-        <p>State-of-the-art accuracy with 25 languages and automatic detection. Runs via ONNX Runtime.</p>
+        <h3>Parakeet TDT v3 <span class="best-pill">Best Model</span></h3>
+        <p data-i18n="parakeetDesc">State-of-the-art accuracy with 25 languages and automatic detection. Runs via ONNX Runtime.</p>
         <div class="engine-models">
           <span class="engine-model-tag">int8 ~670 MB</span>
           <span class="engine-model-tag">WER 7.7% FR</span>
@@ -593,9 +641,9 @@
 
   <!-- CTA -->
   <section class="cta">
-    <h2>Ready to try?</h2>
-    <p>Light Whisper is free and open source. Download it, pick a model, and start talking.</p>
-    <a href="https://github.com/aluzed/light-whisper/releases/latest" target="_blank" class="btn btn-primary">
+    <h2 data-i18n="ctaTitle">Ready to try?</h2>
+    <p data-i18n="ctaDesc">Light Whisper is free and open source. Download it, pick a model, and start talking.</p>
+    <a href="https://github.com/aluzed/light-whisper/releases/latest" target="_blank" class="btn btn-primary" data-i18n="ctaBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Latest Release
     </a>
@@ -609,10 +657,135 @@
       <a href="https://github.com/aluzed/light-whisper/issues" target="_blank">Issues</a>
       <a href="https://github.com/aluzed/light-whisper/blob/main/LICENSE" target="_blank">MIT License</a>
     </div>
-    <p>Made with Rust &amp; Tauri &middot; Light Whisper</p>
+    <p data-i18n="footerMade">Made with Rust &amp; Tauri &middot; Light Whisper</p>
   </footer>
 
   <script>
+    // ── i18n ──
+    const i18n = {
+      en: {
+        heroBadge: 'Open Source \u00b7 MIT License',
+        heroTitle: 'Voice to Text,<br/>Anywhere.',
+        heroDesc: 'Press <strong>Alt+Space</strong> from any application to record your voice. Press again to transcribe and paste instantly.',
+        download: 'Download',
+        sourceCode: 'Source Code',
+        heroPlatforms: 'macOS \u00b7 Windows \u00b7 Linux',
+        demoTitle: 'See it in action',
+        demoDesc: 'Record, transcribe, and paste \u2014 all in one shortcut.',
+        demoStep1: 'Press Alt+Space',
+        demoStep2: 'Speak',
+        demoStep3: 'Text is pasted',
+        featuresTitle: 'Built for simplicity',
+        featGlobalHotkey: 'Global Hotkey',
+        featGlobalHotkeyDesc: 'Alt+Space works from any application. No need to switch windows or open a separate tool.',
+        featOffline: '100% Offline',
+        featOfflineDesc: 'All processing happens locally on your machine. Your voice data never leaves your computer.',
+        featMultiLang: 'Multi-Language',
+        featMultiLangDesc: 'French, English, and 25+ languages with Parakeet. Automatic language detection included.',
+        featAutoPaste: 'Auto-Paste',
+        featAutoPasteDesc: 'Transcribed text is automatically pasted into the active application via clipboard simulation.',
+        featMinimalUI: 'Minimal UI',
+        featMinimalUIDesc: 'A tiny frameless overlay appears during recording. Settings are accessible from the system tray.',
+        featLightweight: 'Lightweight',
+        featLightweightDesc: 'Built with Tauri and Rust. Small binary, low memory footprint, fast startup.',
+        enginesTitle: 'Two powerful engines',
+        enginesDesc: 'Choose the model that fits your needs \u2014 from 40 MB ultra-fast to high-accuracy multi-language.',
+        whisperDesc: 'The reference open-source speech recognition model, running locally via whisper.cpp.',
+        parakeetDesc: 'State-of-the-art accuracy with 25 languages and automatic detection. Runs via ONNX Runtime.',
+        ctaTitle: 'Ready to try?',
+        ctaDesc: 'Light Whisper is free and open source. Download it, pick a model, and start talking.',
+        ctaBtn: 'Download Latest Release',
+        footerMade: 'Made with Rust & Tauri \u00b7 Light Whisper',
+      },
+      fr: {
+        heroBadge: 'Open Source \u00b7 Licence MIT',
+        heroTitle: 'Voix vers Texte,<br/>Partout.',
+        heroDesc: 'Appuyez sur <strong>Alt+Espace</strong> depuis n\u2019importe quelle application pour enregistrer votre voix. Appuyez \u00e0 nouveau pour transcrire et coller instantan\u00e9ment.',
+        download: 'T\u00e9l\u00e9charger',
+        sourceCode: 'Code Source',
+        heroPlatforms: 'macOS \u00b7 Windows \u00b7 Linux',
+        demoTitle: 'Voyez par vous-m\u00eame',
+        demoDesc: 'Enregistrez, transcrivez et collez \u2014 en un seul raccourci.',
+        demoStep1: 'Appuyez sur Alt+Espace',
+        demoStep2: 'Parlez',
+        demoStep3: 'Le texte est coll\u00e9',
+        featuresTitle: 'Con\u00e7u pour la simplicit\u00e9',
+        featGlobalHotkey: 'Raccourci Global',
+        featGlobalHotkeyDesc: 'Alt+Espace fonctionne depuis n\u2019importe quelle application. Pas besoin de changer de fen\u00eatre.',
+        featOffline: '100% Hors-ligne',
+        featOfflineDesc: 'Tout le traitement se fait localement sur votre machine. Vos donn\u00e9es vocales ne quittent jamais votre ordinateur.',
+        featMultiLang: 'Multi-Langues',
+        featMultiLangDesc: 'Fran\u00e7ais, anglais et 25+ langues avec Parakeet. D\u00e9tection automatique de la langue incluse.',
+        featAutoPaste: 'Collage Auto',
+        featAutoPasteDesc: 'Le texte transcrit est automatiquement coll\u00e9 dans l\u2019application active via simulation du presse-papiers.',
+        featMinimalUI: 'Interface Minimale',
+        featMinimalUIDesc: 'Une petite fen\u00eatre flottante appara\u00eet pendant l\u2019enregistrement. Les param\u00e8tres sont accessibles depuis la barre syst\u00e8me.',
+        featLightweight: 'L\u00e9ger',
+        featLightweightDesc: 'Construit avec Tauri et Rust. Binaire compact, faible empreinte m\u00e9moire, d\u00e9marrage rapide.',
+        enginesTitle: 'Deux moteurs puissants',
+        enginesDesc: 'Choisissez le mod\u00e8le adapt\u00e9 \u00e0 vos besoins \u2014 de 40 Mo ultra-rapide \u00e0 la haute pr\u00e9cision multi-langues.',
+        whisperDesc: 'Le mod\u00e8le de reconnaissance vocale open-source de r\u00e9f\u00e9rence, ex\u00e9cut\u00e9 localement via whisper.cpp.',
+        parakeetDesc: 'Pr\u00e9cision de pointe avec 25 langues et d\u00e9tection automatique. Ex\u00e9cut\u00e9 via ONNX Runtime.',
+        ctaTitle: 'Pr\u00eat \u00e0 essayer\u202f?',
+        ctaDesc: 'Light Whisper est gratuit et open source. T\u00e9l\u00e9chargez-le, choisissez un mod\u00e8le et commencez \u00e0 parler.',
+        ctaBtn: 'T\u00e9l\u00e9charger la derni\u00e8re version',
+        footerMade: 'Fait avec Rust & Tauri \u00b7 Light Whisper',
+      }
+    };
+
+    function setLang(lang) {
+      const t = i18n[lang];
+      document.documentElement.setAttribute('lang', lang);
+      localStorage.setItem('lang', lang);
+
+      // Nav toggle active state
+      document.querySelectorAll('#langToggle button').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+      });
+
+      // Hero
+      document.querySelector('[data-i18n="heroBadge"]').textContent = t.heroBadge;
+      document.querySelector('[data-i18n="heroTitle"]').innerHTML = t.heroTitle;
+      document.querySelector('[data-i18n="heroDesc"]').innerHTML = t.heroDesc;
+      document.querySelector('[data-i18n="download"]').lastChild.textContent = ' ' + t.download;
+      document.querySelector('[data-i18n="sourceCode"]').lastChild.textContent = ' ' + t.sourceCode;
+      document.querySelector('[data-i18n="heroPlatforms"]').textContent = t.heroPlatforms;
+
+      // Demo
+      document.querySelector('[data-i18n="demoTitle"]').textContent = t.demoTitle;
+      document.querySelector('[data-i18n="demoDesc"]').textContent = t.demoDesc;
+      document.querySelectorAll('[data-i18n^="demoStep"]').forEach((el, i) => {
+        el.textContent = t['demoStep' + (i + 1)];
+      });
+
+      // Features
+      document.querySelector('[data-i18n="featuresTitle"]').textContent = t.featuresTitle;
+      const featKeys = ['featGlobalHotkey','featOffline','featMultiLang','featAutoPaste','featMinimalUI','featLightweight'];
+      featKeys.forEach(key => {
+        document.querySelector(`[data-i18n="${key}"]`).textContent = t[key];
+        document.querySelector(`[data-i18n="${key}Desc"]`).textContent = t[key + 'Desc'];
+      });
+
+      // Engines
+      document.querySelector('[data-i18n="enginesTitle"]').textContent = t.enginesTitle;
+      document.querySelector('[data-i18n="enginesDesc"]').textContent = t.enginesDesc;
+      document.querySelector('[data-i18n="whisperDesc"]').textContent = t.whisperDesc;
+      document.querySelector('[data-i18n="parakeetDesc"]').textContent = t.parakeetDesc;
+
+      // CTA
+      document.querySelector('[data-i18n="ctaTitle"]').textContent = t.ctaTitle;
+      document.querySelector('[data-i18n="ctaDesc"]').textContent = t.ctaDesc;
+      document.querySelector('[data-i18n="ctaBtn"]').lastChild.textContent = ' ' + t.ctaBtn;
+
+      // Footer
+      document.querySelector('[data-i18n="footerMade"]').innerHTML = t.footerMade;
+    }
+
+    // Lang toggle listeners
+    document.querySelectorAll('#langToggle button').forEach(btn => {
+      btn.addEventListener('click', () => setLang(btn.dataset.lang));
+    });
+
     const toggle = document.getElementById('themeToggle');
     const icon = document.getElementById('themeIcon');
     const html = document.documentElement;
@@ -638,6 +811,13 @@
       const theme = html.getAttribute('data-theme');
       icon.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;';
     }
+
+    // Restore saved language
+    const savedLang = localStorage.getItem('lang') || 'en';
+    if (savedLang !== 'en') setLang(savedLang);
+    document.querySelectorAll('#langToggle button').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === savedLang);
+    });
 
     // Smooth scroll for nav links
     document.querySelectorAll('a[href^="#"]').forEach(a => {
