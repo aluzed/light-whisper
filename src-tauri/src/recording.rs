@@ -38,6 +38,12 @@ pub fn cancel_recording(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("recorder") {
         let _ = window.hide();
     }
+
+    // Restore focus to the app that was active before recording
+    let pid = state.previous_app_pid.load(Ordering::SeqCst);
+    if pid > 0 {
+        paste::activate_pid(pid);
+    }
 }
 
 pub fn do_toggle_recording(app: &AppHandle) {
