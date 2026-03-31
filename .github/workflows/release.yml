@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Sync version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i '' "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" src-tauri/tauri.conf.json
+          sed -i '' "s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/Cargo.toml
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -50,6 +56,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Sync version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" src-tauri/tauri.conf.json
+          sed -i "s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/Cargo.toml
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -79,6 +91,13 @@ jobs:
     environment: prod
     steps:
       - uses: actions/checkout@v4
+
+      - name: Sync version from tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" src-tauri/tauri.conf.json
+          sed -i "s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/Cargo.toml
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
