@@ -129,6 +129,10 @@ pub fn do_toggle_recording(app: &AppHandle) {
         }
 
         if let Err(e) = state.recorder.lock().unwrap().start(&device, app.clone()) {
+            let _ = app.emit("recording-stopped", ());
+            if let Some(window) = app.get_webview_window("recorder") {
+                let _ = window.hide();
+            }
             emit_error(app, &format!("Cannot start recording: {}", e));
         } else {
             register_escape(app);

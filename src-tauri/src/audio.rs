@@ -1,6 +1,8 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 use tauri::{AppHandle, Emitter};
 
 /// Thread-safe audio recorder that keeps the cpal::Stream on a dedicated thread.
@@ -37,22 +39,52 @@ impl AudioRecorder {
         }
 
         self.samples.lock().unwrap().clear();
+        *self.sample_rate.lock().unwrap() = 0;
         self.recording.store(true, Ordering::SeqCst);
 
         let samples = Arc::clone(&self.samples);
         let recording = Arc::clone(&self.recording);
         let sample_rate_out = Arc::clone(&self.sample_rate);
         let device_name = device_name.to_string();
+        let (started_tx, started_rx) = mpsc::sync_channel(1);
+        let recording_for_error = Arc::clone(&self.recording);
 
         let handle = std::thread::spawn(move || {
-            if let Err(e) = run_recording(device_name, samples, recording, sample_rate_out, app.clone()) {
+            let result = run_recording(
+                device_name,
+                samples,
+                recording,
+                sample_rate_out,
+                app,
+                started_tx.clone(),
+            );
+            if let Err(e) = result {
                 eprintln!("Recording error: {}", e);
-                let _ = app.emit("app-error", format!("Audio error: {}", e));
+                recording_for_error.store(false, Ordering::SeqCst);
+                let _ = started_tx.send(Err(e));
             }
         });
 
-        self.thread_handle = Some(handle);
-        Ok(())
+        match started_rx.recv_timeout(Duration::from_secs(5)) {
+            Ok(Ok(())) => {
+                self.thread_handle = Some(handle);
+                Ok(())
+            }
+            Ok(Err(e)) => {
+                let _ = handle.join();
+                self.recording.store(false, Ordering::SeqCst);
+                Err(e)
+            }
+            Err(mpsc::RecvTimeoutError::Timeout) => {
+                self.recording.store(false, Ordering::SeqCst);
+                Err("Timed out while starting audio stream".to_string())
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                let _ = handle.join();
+                self.recording.store(false, Ordering::SeqCst);
+                Err("Audio recording thread exited before starting".to_string())
+            }
+        }
     }
 
     pub fn stop(&mut self) -> Result<(Vec<f32>, u32), String> {
@@ -80,6 +112,7 @@ fn run_recording(
     recording: Arc<AtomicBool>,
     sample_rate_out: Arc<Mutex<u32>>,
     app: AppHandle,
+    started_tx: mpsc::SyncSender<Result<(), String>>,
 ) -> Result<(), String> {
     let host = cpal::default_host();
 
@@ -101,83 +134,121 @@ fn run_recording(
     *sample_rate_out.lock().unwrap() = sr;
     let channels = config.channels() as usize;
 
-    let recording_flag = Arc::clone(&recording);
     let waveform_counter = Arc::new(Mutex::new(0u32));
     let waveform_buf = Arc::new(Mutex::new(Vec::<f32>::new()));
-    let wc = Arc::clone(&waveform_counter);
-    let wb = Arc::clone(&waveform_buf);
-    let app_clone = app.clone();
 
     let stream = match config.sample_format() {
-        cpal::SampleFormat::F32 => device.build_input_stream(
+        cpal::SampleFormat::F32 => build_input_stream(
+            &device,
             &config.into(),
-            move |data: &[f32], _: &cpal::InputCallbackInfo| {
-                if !recording_flag.load(Ordering::SeqCst) {
-                    return;
-                }
-
-                let mono: Vec<f32> = data
-                    .chunks(channels)
-                    .map(|frame| frame.iter().sum::<f32>() / channels as f32)
-                    .collect();
-
-                samples.lock().unwrap().extend_from_slice(&mono);
-
-                let mut counter = wc.lock().unwrap();
-                let mut buf = wb.lock().unwrap();
-                buf.extend_from_slice(&mono);
-                *counter += mono.len() as u32;
-
-                if *counter >= 800 {
-                    let rms = (buf.iter().map(|s| s * s).sum::<f32>() / buf.len() as f32)
-                        .sqrt()
-                        .min(1.0);
-                    let _ = app_clone.emit("waveform-update", rms);
-                    buf.clear();
-                    *counter = 0;
-                }
-            },
-            |err| eprintln!("Audio stream error: {}", err),
-            None,
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: f32| s,
         ),
-        cpal::SampleFormat::I16 => {
-            let samples = Arc::clone(&samples);
-            device.build_input_stream(
-                &config.into(),
-                move |data: &[i16], _: &cpal::InputCallbackInfo| {
-                    if !recording_flag.load(Ordering::SeqCst) {
-                        return;
-                    }
-
-                    let mono: Vec<f32> = data
-                        .chunks(channels)
-                        .map(|frame| {
-                            frame.iter().map(|&s| s as f32 / 32768.0).sum::<f32>()
-                                / channels as f32
-                        })
-                        .collect();
-
-                    samples.lock().unwrap().extend_from_slice(&mono);
-
-                    let mut counter = wc.lock().unwrap();
-                    let mut buf = wb.lock().unwrap();
-                    buf.extend_from_slice(&mono);
-                    *counter += mono.len() as u32;
-
-                    if *counter >= 800 {
-                        let rms = (buf.iter().map(|s| s * s).sum::<f32>() / buf.len() as f32)
-                            .sqrt()
-                            .min(1.0);
-                        let _ = app_clone.emit("waveform-update", rms);
-                        buf.clear();
-                        *counter = 0;
-                    }
-                },
-                |err| eprintln!("Audio stream error: {}", err),
-                None,
-            )
-        }
-        _ => return Err("Unsupported sample format".to_string()),
+        cpal::SampleFormat::F64 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: f64| s as f32,
+        ),
+        cpal::SampleFormat::I8 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: i8| s as f32 / 128.0,
+        ),
+        cpal::SampleFormat::I16 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: i16| s as f32 / 32768.0,
+        ),
+        cpal::SampleFormat::I32 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: i32| s as f32 / 2_147_483_648.0,
+        ),
+        cpal::SampleFormat::I64 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: i64| s as f32 / 9_223_372_036_854_775_808.0,
+        ),
+        cpal::SampleFormat::U8 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: u8| (s as f32 - 128.0) / 128.0,
+        ),
+        cpal::SampleFormat::U16 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: u16| (s as f32 - 32768.0) / 32768.0,
+        ),
+        cpal::SampleFormat::U32 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: u32| (s as f32 - 2_147_483_648.0) / 2_147_483_648.0,
+        ),
+        cpal::SampleFormat::U64 => build_input_stream(
+            &device,
+            &config.into(),
+            channels,
+            samples,
+            Arc::clone(&recording),
+            waveform_counter,
+            waveform_buf,
+            app.clone(),
+            |s: u64| (s as f32 - 9_223_372_036_854_775_808.0) / 9_223_372_036_854_775_808.0,
+        ),
+        sample_format => return Err(format!("Unsupported sample format: {}", sample_format)),
     }
     .map_err(|e| format!("Failed to build stream: {}", e))?;
 
@@ -186,6 +257,7 @@ fn run_recording(
         .map_err(|e| format!("Failed to start stream: {}", e))?;
 
     let _ = app.emit("recording-started", ());
+    let _ = started_tx.send(Ok(()));
 
     // Keep thread alive while recording
     while recording.load(Ordering::SeqCst) {
@@ -195,6 +267,54 @@ fn run_recording(
     // Stream is dropped here, stopping capture
     drop(stream);
     Ok(())
+}
+
+fn build_input_stream<T, F>(
+    device: &cpal::Device,
+    config: &cpal::StreamConfig,
+    channels: usize,
+    samples: Arc<Mutex<Vec<f32>>>,
+    recording: Arc<AtomicBool>,
+    waveform_counter: Arc<Mutex<u32>>,
+    waveform_buf: Arc<Mutex<Vec<f32>>>,
+    app: AppHandle,
+    convert: F,
+) -> Result<cpal::Stream, cpal::BuildStreamError>
+where
+    T: cpal::SizedSample + Copy,
+    F: Fn(T) -> f32 + Send + 'static + Copy,
+{
+    device.build_input_stream(
+        config,
+        move |data: &[T], _: &cpal::InputCallbackInfo| {
+            if !recording.load(Ordering::SeqCst) {
+                return;
+            }
+
+            let mono: Vec<f32> = data
+                .chunks(channels)
+                .map(|frame| frame.iter().map(|&s| convert(s)).sum::<f32>() / channels as f32)
+                .collect();
+
+            samples.lock().unwrap().extend_from_slice(&mono);
+
+            let mut counter = waveform_counter.lock().unwrap();
+            let mut buf = waveform_buf.lock().unwrap();
+            buf.extend_from_slice(&mono);
+            *counter += mono.len() as u32;
+
+            if *counter >= 800 {
+                let rms = (buf.iter().map(|s| s * s).sum::<f32>() / buf.len() as f32)
+                    .sqrt()
+                    .min(1.0);
+                let _ = app.emit("waveform-update", rms);
+                buf.clear();
+                *counter = 0;
+            }
+        },
+        |err| eprintln!("Audio stream error: {}", err),
+        None,
+    )
 }
 
 pub fn list_input_devices() -> Vec<String> {
