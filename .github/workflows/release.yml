@@ -12,6 +12,9 @@ jobs:
   build-macos:
     runs-on: macos-14
     environment: prod
+    # Notarization can fail when Apple requires a new/renewed developer
+    # agreement. Keep Windows/Linux releases flowing while that is resolved.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -51,7 +54,7 @@ jobs:
           args: --target aarch64-apple-darwin
 
   build-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment: prod
     steps:
       - uses: actions/checkout@v4
