@@ -1,4 +1,4 @@
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 use crate::audio;
 use crate::config;
@@ -21,26 +21,27 @@ pub fn save_config(
     let old_config = state.config.lock().unwrap().clone();
     *state.config.lock().unwrap() = config.clone();
 
-    // Reload engine if engine type or model size changed
     let engine_changed = old_config.engine != config.engine;
     let model_changed = old_config.model_size != config.model_size;
+    let needs_load = engine_changed
+        || (model_changed && config.engine == "whisper")
+        || !state.engine.lock().unwrap().is_loaded();
 
-    if engine_changed {
-        let mut engine = state.engine.lock().unwrap();
-        *engine = stt::SttEngine::from_engine_name(&config.engine);
-        // Try to load model for the new engine
-        let model_path = get_model_path_for_config(&config);
-        if model_path.exists() {
-            let _ = engine.load_model(&model_path);
-        }
-    } else if model_changed && config.engine == "whisper" {
-        let model_path = model_manager::whisper_model_path(&config.model_size);
-        if model_path.exists() {
-            let mut engine = state.engine.lock().unwrap();
-            let _ = engine.load_model(&model_path);
-        }
+    if needs_load {
+        reload_engine(&state)?;
     }
 
+    Ok(())
+}
+
+fn reload_engine(state: &AppState) -> Result<(), String> {
+    let config = state.config.lock().unwrap().clone();
+    let model_path = get_model_path_for_config(&config);
+    let mut engine = stt::SttEngine::from_engine_name(&config.engine);
+    if model_path.exists() {
+        engine.load_model(&model_path)?;
+    }
+    *state.engine.lock().unwrap() = engine;
     Ok(())
 }
 
@@ -58,11 +59,17 @@ pub fn check_model_exists(engine: String, model_size: String) -> bool {
 pub async fn download_model(engine: String, model_size: String, app: AppHandle) -> Result<(), String> {
     match engine.as_str() {
         "parakeet" => {
-            model_manager::download_parakeet_model(app).await?;
+            model_manager::download_parakeet_model(app.clone()).await?;
         }
         _ => {
-            model_manager::download_whisper_model(&model_size, app).await?;
+            model_manager::download_whisper_model(&model_size, app.clone()).await?;
         }
+    }
+
+    let state = app.state::<AppState>();
+    let active = state.config.lock().unwrap().clone();
+    if active.engine == engine && (engine == "parakeet" || active.model_size == model_size) {
+        reload_engine(&state)?;
     }
     Ok(())
 }
