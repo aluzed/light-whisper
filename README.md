@@ -11,7 +11,7 @@ Built with [Tauri v2](https://v2.tauri.app/) (Rust backend, vanilla JS frontend)
 - **Global hotkey** (Alt+Space) works from any application
 - **Two STT engines:**
   - [Whisper](https://github.com/openai/whisper) (OpenAI) via whisper.cpp — models from 40 MB to 500 MB
-  - [Parakeet TDT v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) (NVIDIA) via ONNX Runtime — ~670 MB, 25 languages, auto-detection
+  - [Parakeet TDT v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) (NVIDIA) int8 via ONNX Runtime: ~670 MB, 25 languages, auto-detection
 - **French & English** support (and more with Parakeet)
 - **Auto-paste**: transcribed text is automatically pasted via clipboard + keyboard simulation
 - **Minimal UI**: frameless overlay during recording, settings accessible from the tray icon
